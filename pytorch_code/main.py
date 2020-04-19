@@ -9,8 +9,8 @@ Created on July, 2018
 import argparse
 import pickle
 import time
-from .utils import build_graph, Data, split_validation
-from .model import *
+from utils import build_graph, Data, split_validation
+from model import *
 import wandb
 
 parser = argparse.ArgumentParser()
