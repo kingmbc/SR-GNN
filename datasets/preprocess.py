@@ -29,7 +29,7 @@ elif opt.dataset =='yoochoose':
 print("-- Starting @ %ss" % datetime.datetime.now())
 with open(os.path.join(opt.data_folder, dataset), "r") as f:
     if opt.dataset == 'yoochoose':
-        reader = csv.DictReader(f, delimiter=',')
+        reader = csv.DictReader(f, fieldnames=['session_id', 'timestamp', 'item_id', 'category'], delimiter=',')
     else:
         reader = csv.DictReader(f, delimiter=';')
     sess_clicks = {}
