@@ -138,7 +138,7 @@ def train_test(epoch, model, train_data, test_data):
         train_loss = model.loss_function(scores, targets - 1)
         train_loss.backward()
         model.optimizer.step()
-        total_train_loss += train_loss
+        total_train_loss += train_loss.item()
         if j % int(len(slices) / 5 + 1) == 0:
             print('[%d/%d] Loss: %.4f' % (j, len(slices), train_loss.item()))
     print('\tLoss:\t%.3f' % total_train_loss)
@@ -152,7 +152,7 @@ def train_test(epoch, model, train_data, test_data):
         targets, scores = forward(model, i, test_data)
         targets = trans_to_cuda(torch.Tensor(targets).long())
         valid_loss = model.loss_function(scores, targets - 1)
-        total_valid_loss += valid_loss
+        total_valid_loss += valid_loss.item()
         sub_scores = scores.topk(20)[1]
         sub_scores = trans_to_cpu(sub_scores).detach().numpy()
         targets = trans_to_cpu(targets).detach().numpy()
