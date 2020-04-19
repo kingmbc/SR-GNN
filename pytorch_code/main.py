@@ -9,8 +9,9 @@ Created on July, 2018
 import argparse
 import pickle
 import time
-from utils import build_graph, Data, split_validation
-from model import *
+from .utils import build_graph, Data, split_validation
+from .model import *
+import wandb
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--dataset', default='sample', help='dataset name: diginetica/yoochoose1_4/yoochoose1_64/sample')
@@ -26,39 +27,48 @@ parser.add_argument('--patience', type=int, default=10, help='the number of epoc
 parser.add_argument('--nonhybrid', action='store_true', help='only use the global preference to predict')
 parser.add_argument('--validation', action='store_true', help='validation')
 parser.add_argument('--valid_portion', type=float, default=0.1, help='split the portion of training set as validation set')
-opt = parser.parse_args()
-print(opt)
+
+parser.add_argument('--data_folder', default='../_data/yoochoose-prep/', type=str)
+parser.add_argument('--train_data', default='recSys15TrainOnly.txt', type=str)
+parser.add_argument('--valid_data', default='recSys15Valid.txt', type=str)
+
+args = parser.parse_args()
+print(args)
+
+wandb.init(project="SR-GNN Project",
+           name=args.dataset)
+config = wandb.config
 
 
 def main():
-    train_data = pickle.load(open('../datasets/' + opt.dataset + '/train.txt', 'rb'))
-    if opt.validation:
-        train_data, valid_data = split_validation(train_data, opt.valid_portion)
+    train_data = pickle.load(open('../_data/' + args.dataset + '/train.txt', 'rb'))
+    if args.validation:
+        train_data, valid_data = split_validation(train_data, args.valid_portion)
         test_data = valid_data
     else:
-        test_data = pickle.load(open('../datasets/' + opt.dataset + '/test.txt', 'rb'))
-    # all_train_seq = pickle.load(open('../datasets/' + opt.dataset + '/all_train_seq.txt', 'rb'))
+        test_data = pickle.load(open('../_data/' + args.dataset + '/test.txt', 'rb'))
+    # all_train_seq = pickle.load(open('../_data/' + args.dataset + '/all_train_seq.txt', 'rb'))
     # g = build_graph(all_train_seq)
     train_data = Data(train_data, shuffle=True)
     test_data = Data(test_data, shuffle=False)
     # del all_train_seq, g
-    if opt.dataset == 'diginetica':
+    if args.dataset == 'diginetica':
         n_node = 43098
-    elif opt.dataset == 'yoochoose1_64' or opt.dataset == 'yoochoose1_4':
+    elif args.dataset == 'yoochoose1_64' or args.dataset == 'yoochoose1_4':
         n_node = 37484
     else:
         n_node = 310
 
-    model = trans_to_cuda(SessionGraph(opt, n_node))
+    model = trans_to_cuda(SessionGraph(args, n_node))
 
     start = time.time()
     best_result = [0, 0]
     best_epoch = [0, 0]
     bad_counter = 0
-    for epoch in range(opt.epoch):
+    for epoch in range(args.epoch):
         print('-------------------------------------------------------')
         print('epoch: ', epoch)
-        hit, mrr = train_test(model, train_data, test_data)
+        hit, mrr = train_test(epoch, model, train_data, test_data)
         flag = 0
         if hit >= best_result[0]:
             best_result[0] = hit
@@ -69,9 +79,15 @@ def main():
             best_epoch[1] = epoch
             flag = 1
         print('Best Result:')
-        print('\tRecall@20:\t%.4f\tMMR@20:\t%.4f\tEpoch:\t%d,\t%d'% (best_result[0], best_result[1], best_epoch[0], best_epoch[1]))
+        print(f'\tRecall@20:\t{best_result[0]:.4f}'
+              f'\tMMR@20:\t{best_result[1]:.4f}'
+              f'\tEpoch:\t{best_epoch[0]},\t{best_epoch[1]}')
+        wandb.log({"best_recall": best_result[0],
+                   "best_mrr": best_result[1],
+                   "best_recall_epoch": best_epoch[0],
+                   "best_mrr_epoch": best_epoch[1]})
         bad_counter += 1 - flag
-        if bad_counter >= opt.patience:
+        if bad_counter >= args.patience:
             break
     print('-------------------------------------------------------')
     end = time.time()

@@ -6,6 +6,7 @@ Created on July, 2018
 @author: Tangrizzly
 """
 
+import time
 import datetime
 import math
 import numpy as np
@@ -13,6 +14,7 @@ import torch
 from torch import nn
 from torch.nn import Module, Parameter
 import torch.nn.functional as F
+import wandb
 
 
 class GNN(Module):
@@ -120,30 +122,35 @@ def forward(model, i, data):
     return targets, model.compute_scores(seq_hidden, mask)
 
 
-def train_test(model, train_data, test_data):
+def train_test(epoch, model, train_data, test_data):
+    st = time.time()
     model.scheduler.step()
     print('start training: ', datetime.datetime.now())
     model.train()
-    total_loss = 0.0
+    total_train_loss = 0.0
     slices = train_data.generate_batch(model.batch_size)
     for i, j in zip(slices, np.arange(len(slices))):
         model.optimizer.zero_grad()
         targets, scores = forward(model, i, train_data)
         targets = trans_to_cuda(torch.Tensor(targets).long())
-        loss = model.loss_function(scores, targets - 1)
-        loss.backward()
+        train_loss = model.loss_function(scores, targets - 1)
+        train_loss.backward()
         model.optimizer.step()
-        total_loss += loss
+        total_train_loss += train_loss
         if j % int(len(slices) / 5 + 1) == 0:
-            print('[%d/%d] Loss: %.4f' % (j, len(slices), loss.item()))
-    print('\tLoss:\t%.3f' % total_loss)
+            print('[%d/%d] Loss: %.4f' % (j, len(slices), train_loss.item()))
+    print('\tLoss:\t%.3f' % total_train_loss)
 
     print('start predicting: ', datetime.datetime.now())
     model.eval()
+    total_valid_loss = 0.0
     hit, mrr = [], []
     slices = test_data.generate_batch(model.batch_size)
     for i in slices:
         targets, scores = forward(model, i, test_data)
+        targets = trans_to_cuda(torch.Tensor(targets).long())
+        valid_loss = model.loss_function(scores, targets - 1)
+        total_valid_loss += valid_loss
         sub_scores = scores.topk(20)[1]
         sub_scores = trans_to_cpu(sub_scores).detach().numpy()
         for score, target, mask in zip(sub_scores, targets, test_data.mask):
@@ -154,4 +161,9 @@ def train_test(model, train_data, test_data):
                 mrr.append(1 / (np.where(score == target - 1)[0][0] + 1))
     hit = np.mean(hit) * 100
     mrr = np.mean(mrr) * 100
+
+    wandb.log({'epoch': epoch, 'train_loss': total_train_loss,
+               'valid_loss': total_valid_loss, 'valid_recall': hit, 'valid_mrr': mrr,
+               'time': time.time() - st})
+
     return hit, mrr
