@@ -41,13 +41,13 @@ config = wandb.config
 
 
 def main():
-    train_data = pickle.load(open('../_data/' + args.dataset + '/train.txt', 'rb'))
+    train_data = pickle.load(open('../../_data/' + args.dataset + '/train.txt', 'rb'))
     if args.validation:
         train_data, valid_data = split_validation(train_data, args.valid_portion)
         test_data = valid_data
     else:
-        test_data = pickle.load(open('../_data/' + args.dataset + '/test.txt', 'rb'))
-    # all_train_seq = pickle.load(open('../_data/' + args.dataset + '/all_train_seq.txt', 'rb'))
+        test_data = pickle.load(open('../../_data/' + args.dataset + '/test.txt', 'rb'))
+    # all_train_seq = pickle.load(open('../../_data/' + args.dataset + '/all_train_seq.txt', 'rb'))
     # g = build_graph(all_train_seq)
     train_data = Data(train_data, shuffle=True)
     test_data = Data(test_data, shuffle=False)
