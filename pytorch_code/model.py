@@ -96,16 +96,18 @@ class SessionGraph(Module):
         return hidden
 
 
+
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 def trans_to_cuda(variable):
     if torch.cuda.is_available():
-        return variable.to("cuda")
+        return variable.to(device)
     else:
         return variable
 
 
 def trans_to_cpu(variable):
     if torch.cuda.is_available():
-        return variable.to("cpu")
+        return variable.to(device)
     else:
         return variable
 
