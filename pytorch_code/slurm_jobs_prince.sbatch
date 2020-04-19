@@ -42,4 +42,4 @@ fi
 source activate pytorch
 cd /scratch/tk2637/SR-GNN/pytorch_code
 
-python main.py --dataset yoochoose1_4
+bash train_script.sh $dataset
