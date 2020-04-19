@@ -148,7 +148,7 @@ def train_test(epoch, model, train_data, test_data):
     slices = test_data.generate_batch(model.batch_size)
     for i in slices:
         targets, scores = forward(model, i, test_data)
-        targets = trans_to_cpu(torch.Tensor(targets).long())
+        targets = trans_to_cpu(torch.Tensor(targets).long()).detach()
         valid_loss = model.loss_function(scores, targets - 1)
         total_valid_loss += valid_loss
         sub_scores = scores.topk(20)[1]
