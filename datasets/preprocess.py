@@ -15,18 +15,19 @@ import datetime
 import os
 
 parser = argparse.ArgumentParser()
+parser.add_argument('--data_folder', default='../../_data/', type=str)
 parser.add_argument('--dataset', default='sample', help='dataset name: diginetica/yoochoose/sample')
 opt = parser.parse_args()
 print(opt)
 
-dataset = 'sample_train-item-views.csv'
+dataset = 'sample-origin/sample_train-item-views.csv'
 if opt.dataset == 'diginetica':
-    dataset = 'train-item-views.csv'
+    dataset = 'diginetica-origin/train-item-views.csv'
 elif opt.dataset =='yoochoose':
-    dataset = 'yoochoose-clicks.dat'
+    dataset = 'yoochoose-origin/yoochoose-clicks.dat'
 
 print("-- Starting @ %ss" % datetime.datetime.now())
-with open(dataset, "r") as f:
+with open(os.path.join(opt.data_folder, dataset), "r") as f:
     if opt.dataset == 'yoochoose':
         reader = csv.DictReader(f, delimiter=',')
     else:
@@ -37,7 +38,11 @@ with open(dataset, "r") as f:
     curid = -1
     curdate = None
     for data in reader:
-        sessid = data['session_id']
+        try:
+            sessid = data['session_id']
+        except:
+            sessid = data['sessionId']
+
         if curdate and not curid == sessid:
             date = ''
             if opt.dataset == 'yoochoose':
@@ -49,7 +54,10 @@ with open(dataset, "r") as f:
         if opt.dataset == 'yoochoose':
             item = data['item_id']
         else:
-            item = data['item_id'], int(data['timeframe'])
+            try:
+                item = data['item_id'], int(data['timeframe'])
+            except:
+                item = data['itemId'], int(data['timeframe'])
         curdate = ''
         if opt.dataset == 'yoochoose':
             curdate = data['timestamp']
@@ -208,6 +216,7 @@ for seq in tra_seqs:
 for seq in tes_seqs:
     all += len(seq)
 print('avg length: ', all/(len(tra_seqs) + len(tes_seqs) * 1.0))
+
 if opt.dataset == 'diginetica':
     if not os.path.exists('diginetica'):
         os.makedirs('diginetica')
@@ -238,6 +247,12 @@ elif opt.dataset == 'yoochoose':
 else:
     if not os.path.exists('sample'):
         os.makedirs('sample')
+
+    import pandas as pd
+    df_tra = pd.DataFrame({'input': tra[0], 'target': tra[1] })
+    df_tes = pd.DataFrame({'input': tes[0], 'target': tes[1]})
+    df_tra_seqs = pd.DataFrame({'seq': tra_seqs})
+
     pickle.dump(tra, open('sample/train.txt', 'wb'))
     pickle.dump(tes, open('sample/test.txt', 'wb'))
     pickle.dump(tra_seqs, open('sample/all_train_seq.txt', 'wb'))
