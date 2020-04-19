@@ -107,7 +107,7 @@ def trans_to_cuda(variable):
 
 def trans_to_cpu(variable):
     if torch.cuda.is_available():
-        return variable.to("cpu")
+        return variable.cpu()
     else:
         return variable
 
