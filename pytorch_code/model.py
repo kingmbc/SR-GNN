@@ -124,6 +124,7 @@ def forward(model, i, data):
 
 def train_test(epoch, model, train_data, test_data):
     st = time.time()
+    model.scheduler.step()
     print('start training: ', datetime.datetime.now())
     model.train()
     total_train_loss = 0.0
@@ -135,7 +136,6 @@ def train_test(epoch, model, train_data, test_data):
         train_loss = model.loss_function(scores, targets - 1)
         train_loss.backward()
         model.optimizer.step()
-        model.scheduler.step()
         total_train_loss += train_loss.item()
         if j % int(len(slices) / 5 + 1) == 0:
             print('[%d/%d] Loss: %.4f' % (j, len(slices), train_loss.item()))
