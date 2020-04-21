@@ -148,18 +148,22 @@ def train_test(epoch, model, train_data, test_data):
     slices = test_data.generate_batch(model.batch_size)
     for i in slices:
         targets, scores = forward(model, i, test_data)
-        targets = trans_to_cuda(torch.Tensor(targets).long())
-        valid_loss = model.loss_function(scores, targets - 1)
-        total_valid_loss += valid_loss.item()
+        # targets = trans_to_cuda(torch.Tensor(targets).long())
+        # valid_loss = model.loss_function(scores, targets - 1)
+        # total_valid_loss += valid_loss.item()
         sub_scores = scores.topk(20)[1]
         sub_scores = trans_to_cpu(sub_scores).detach().numpy()
-        targets = trans_to_cpu(targets).detach().numpy()
+        # targets = trans_to_cpu(targets).detach().numpy()
         for score, target, mask in zip(sub_scores, targets, test_data.mask):
             hit.append(np.isin(target - 1, score))
             if len(np.where(score == target - 1)[0]) == 0:
                 mrr.append(0)
             else:
                 mrr.append(1 / (np.where(score == target - 1)[0][0] + 1))
+        targets = trans_to_cuda(torch.Tensor(targets).long())
+        valid_loss = model.loss_function(scores, targets - 1)
+        total_valid_loss += valid_loss.item()
+
     hit = np.mean(hit) * 100
     mrr = np.mean(mrr) * 100
 
