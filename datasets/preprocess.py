@@ -218,18 +218,16 @@ for seq in tes_seqs:
 print('avg length: ', all/(len(tra_seqs) + len(tes_seqs) * 1.0))
 
 if opt.dataset == 'diginetica':
-    if not os.path.exists('diginetica'):
-        os.makedirs('diginetica')
-    pickle.dump(tra, open('diginetica/train.txt', 'wb'))
-    pickle.dump(tes, open('diginetica/test.txt', 'wb'))
-    pickle.dump(tra_seqs, open('diginetica/all_train_seq.txt', 'wb'))
+    if not os.path.exists(os.path.join(opt.data_folder, 'diginetica-prep')):
+        os.makedirs(os.path.join(opt.data_folder, 'diginetica-prep'))
+    pickle.dump(tra, open(os.path.join(opt.data_folder, 'diginetica-prep', 'train.txt'), 'wb'))
+    pickle.dump(tes, open(os.path.join(opt.data_folder, 'diginetica-prep', 'test.txt'), 'wb'))
+    pickle.dump(tra_seqs, open(os.path.join(opt.data_folder, 'diginetica-prep', 'all_train_seq.txt'), 'wb'))
 elif opt.dataset == 'yoochoose':
-    if not os.path.exists('yoochoose1_4'):
-        os.makedirs('yoochoose1_4')
-    if not os.path.exists('yoochoose1_64'):
-        os.makedirs('yoochoose1_64')
-    pickle.dump(tes, open('yoochoose1_4/test.txt', 'wb'))
-    pickle.dump(tes, open('yoochoose1_64/test.txt', 'wb'))
+    if not os.path.exists(os.path.join(opt.data_folder, 'yoochoose-prep')):
+        os.makedirs(os.path.join(opt.data_folder, 'yoochoose-prep'))
+    pickle.dump(tes, open(os.path.join(opt.data_folder, 'yoochoose-prep', 'yoochoose1_4-test.txt'), 'wb'))
+    pickle.dump(tes, open(os.path.join(opt.data_folder, 'yoochoose-prep', 'yoochoose1_64-test.txt'), 'wb'))
 
     split4, split64 = int(len(tr_seqs) / 4), int(len(tr_seqs) / 64)
     print(len(tr_seqs[-split4:]))
@@ -238,23 +236,23 @@ elif opt.dataset == 'yoochoose':
     tra4, tra64 = (tr_seqs[-split4:], tr_labs[-split4:]), (tr_seqs[-split64:], tr_labs[-split64:])
     seq4, seq64 = tra_seqs[tr_ids[-split4]:], tra_seqs[tr_ids[-split64]:]
 
-    pickle.dump(tra4, open('yoochoose1_4/train.txt', 'wb'))
-    pickle.dump(seq4, open('yoochoose1_4/all_train_seq.txt', 'wb'))
+    pickle.dump(tra4, open(os.path.join(opt.data_folder, 'yoochoose-prep', 'yoochoose1_4-train.txt'), 'wb'))
+    pickle.dump(seq4, open(os.path.join(opt.data_folder, 'yoochoose-prep', 'yoochoose1_4-all_train_seq.txt'), 'wb'))
 
-    pickle.dump(tra64, open('yoochoose1_64/train.txt', 'wb'))
-    pickle.dump(seq64, open('yoochoose1_64/all_train_seq.txt', 'wb'))
+    pickle.dump(tra64, open(os.path.join(opt.data_folder, 'yoochoose-prep', 'yoochoose1_64-train.txt'), 'wb'))
+    pickle.dump(seq64, open(os.path.join(opt.data_folder, 'yoochoose-prep', 'yoochoose1_64-all_train_seq.txt'), 'wb'))
 
 else:
-    if not os.path.exists('sample'):
-        os.makedirs('sample')
+    if not os.path.exists(os.path.join(opt.data_folder, 'sample-prep')):
+        os.makedirs(os.path.join(opt.data_folder, 'sample-prep'))
 
     import pandas as pd
-    df_tra = pd.DataFrame({'input': tra[0], 'target': tra[1] })
+    df_tra = pd.DataFrame({'input': tra[0], 'target': tra[1]})
     df_tes = pd.DataFrame({'input': tes[0], 'target': tes[1]})
     df_tra_seqs = pd.DataFrame({'seq': tra_seqs})
 
-    pickle.dump(tra, open('sample/train.txt', 'wb'))
-    pickle.dump(tes, open('sample/test.txt', 'wb'))
-    pickle.dump(tra_seqs, open('sample/all_train_seq.txt', 'wb'))
+    pickle.dump(tra, open(os.path.join(opt.data_folder, 'sample-prep', 'train.txt'), 'wb'))
+    pickle.dump(tes, open(os.path.join(opt.data_folder, 'sample-prep', 'test.txt'), 'wb'))
+    pickle.dump(tra_seqs, open(os.path.join(opt.data_folder, 'sample-prep', 'all_train_seq.txt'), 'wb'))
 
 print('Done.')

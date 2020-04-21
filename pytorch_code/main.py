@@ -41,12 +41,20 @@ config = wandb.config
 
 
 def main():
-    train_data = pickle.load(open('../../_data/' + args.dataset + '/train.txt', 'rb'))
+    if "yoochoose" in args.dataset:
+        train_data = pickle.load(open('../../_data/yoochoose-prep/' + args.dataset + '-train.txt', 'rb'))
+    else:
+        train_data = pickle.load(open('../../_data/' + args.dataset + '-prep' + '/train.txt', 'rb'))
+
     if args.validation:
         train_data, valid_data = split_validation(train_data, args.valid_portion)
         test_data = valid_data
     else:
-        test_data = pickle.load(open('../../_data/' + args.dataset + '/test.txt', 'rb'))
+        if "yoochoose" in args.dataset:
+            test_data = pickle.load(open('../../_data/yoochoose-prep/' + args.dataset + '-test.txt', 'rb'))
+        else:
+            test_data = pickle.load(open('../../_data/' + args.dataset + '-prep' + '/test.txt', 'rb'))
+
     # all_train_seq = pickle.load(open('../../_data/' + args.dataset + '/all_train_seq.txt', 'rb'))
     # g = build_graph(all_train_seq)
     train_data = Data(train_data, shuffle=True)
