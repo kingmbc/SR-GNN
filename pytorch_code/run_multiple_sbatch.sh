@@ -9,7 +9,7 @@ if [ $# -lt 1 ]; then
 fi
 
 cluster=$1
-models=(SRGNN) # (simpleGRU GRU4Rec SRGNN)
+models=(SRGNN) # (TimeRec GRU4Rec SRGNN)
 datasets=(diginetica yoochoose1_4 yoochoose1_64) # (yoochoose retailrocket diginetica yoochoose1_4 yoochoose1_64)
 losses=(CrossEntropy) # (TOP1 BPR TOP1-max BPR-max CrossEntropy)
 n_epochs=(30)  #(5 10 20)

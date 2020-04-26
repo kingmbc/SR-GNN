@@ -7,7 +7,6 @@
 
 # How to kill
 #
-#squeue -u tk2637 -n TimeRec-batch
 
 model=$1
 dataset=$2
