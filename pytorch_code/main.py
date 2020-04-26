@@ -110,10 +110,10 @@ def main():
               f'\tMRR@20:\t{best_result[1]:.4f}'
               f'\tEpoch:\t{best_epoch[0]},\t{best_epoch[1]}')
         if args.wandb_on:
-            wandb.log({"best_recall": best_result[0],
-                       "best_mrr": best_result[1],
-                       "best_recall_epoch": best_epoch[0],
-                       "best_mrr_epoch": best_epoch[1]})
+            wandb.log({"best_valid_recall": best_result[0],
+                       "best_valid_mrr": best_result[1],
+                       "best_valid_recall_epoch": best_epoch[0],
+                       "best_valid_mrr_epoch": best_epoch[1]})
         bad_counter += 1 - flag
         if bad_counter >= args.patience:
             break
