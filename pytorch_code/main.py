@@ -58,6 +58,11 @@ args.hostname = os.popen('hostname').read().split('.')[0]
 print(args)
 
 def main():
+    if args.wandb_on:
+        wandb.init(project=args.wandb_project,
+                   name=args.model_name + '-' + args.dataset)
+        wandb.config.update(args)
+
     train_data = pickle.load(open(args.data_folder + args.train_data, 'rb'))
 
     if args.validation:
@@ -80,9 +85,6 @@ def main():
 
     model = trans_to_cuda(SessionGraph(args, n_node))
     if args.wandb_on:
-        wandb.init(project=args.wandb_project,
-                   name=args.model_name + '-' + args.dataset)
-        wandb.config.update(args)
         wandb.watch(model, log="all")
 
 
