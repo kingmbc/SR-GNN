@@ -42,13 +42,11 @@ parser.add_argument('--validation', action='store_true', help='validation')
 parser.add_argument('--valid_portion', type=float, default=0.1, help='split the portion of training set as validation set')
 
 parser.add_argument('--seed', default=22, type=int, help="Seed for random initialization")  # Random seed setting
-parser.add_argument('--data_folder', default='../../_data/yoochoose-prep/', type=str)
-parser.add_argument('--train_data', default='recSys15TrainOnly.txt', type=str)
-parser.add_argument('--valid_data', default='recSys15Valid.txt', type=str)
+parser.add_argument('--data_folder', default='../../_data/diginetica-prep/', type=str)
+parser.add_argument('--train_data', default='train.txt', type=str)
+parser.add_argument('--valid_data', default='test.txt', type=str)
 
 args = parser.parse_args()
-print(args)
-
 args.cuda = torch.cuda.is_available()
 args.device = torch.device('cuda' if args.cuda else 'cpu')
 #use random seed defined
@@ -57,21 +55,16 @@ torch.manual_seed(args.seed)
 if args.cuda:
     torch.cuda.manual_seed(args.seed)
 args.hostname = os.popen('hostname').read().split('.')[0]
+print(args)
 
 def main():
-    if "yoochoose" in args.dataset:
-        train_data = pickle.load(open('../../_data/yoochoose-prep/' + args.dataset + '-train.txt', 'rb'))
-    else:
-        train_data = pickle.load(open('../../_data/' + args.dataset + '-prep' + '/train.txt', 'rb'))
+    train_data = pickle.load(open(args.data_folder + args.train_data, 'rb'))
 
     if args.validation:
         train_data, valid_data = split_validation(train_data, args.valid_portion)
         test_data = valid_data
     else:
-        if "yoochoose" in args.dataset:
-            test_data = pickle.load(open('../../_data/yoochoose-prep/' + args.dataset + '-test.txt', 'rb'))
-        else:
-            test_data = pickle.load(open('../../_data/' + args.dataset + '-prep' + '/test.txt', 'rb'))
+        test_data = pickle.load(open(args.data_folder + args.valid_data, 'rb'))
 
     # all_train_seq = pickle.load(open('../../_data/' + args.dataset + '/all_train_seq.txt', 'rb'))
     # g = build_graph(all_train_seq)
