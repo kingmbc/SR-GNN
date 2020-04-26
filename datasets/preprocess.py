@@ -247,8 +247,8 @@ else:
         os.makedirs(os.path.join(opt.data_folder, 'sample-prep'))
 
     import pandas as pd
-    df_tra = pd.DataFrame({'input': tra[0], 'target': tra[1]})
-    df_tes = pd.DataFrame({'input': tes[0], 'target': tes[1]})
+    df_tra = pd.DataFrame({'input_seq': tra[0], 'target': tra[1]})
+    df_tes = pd.DataFrame({'input_seq': tes[0], 'target': tes[1]})
     df_tra_seqs = pd.DataFrame({'seq': tra_seqs})
 
     pickle.dump(tra, open(os.path.join(opt.data_folder, 'sample-prep', 'train.txt'), 'wb'))

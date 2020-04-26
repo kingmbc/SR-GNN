@@ -6,18 +6,22 @@ Created on July, 2018
 @author: Tangrizzly
 """
 
+import os
 import argparse
 import pickle
 import time
+import numpy as np
+import torch
+import wandb
+
 from utils import build_graph, Data, split_validation
 from model import *
-import wandb
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--dataset', default='sample', help='dataset name: diginetica/yoochoose1_4/yoochoose1_64/sample')
-parser.add_argument('--batchSize', type=int, default=100, help='input batch size')
-parser.add_argument('--hiddenSize', type=int, default=100, help='hidden state size')
-parser.add_argument('--epoch', type=int, default=30, help='the number of epochs to train for')
+parser.add_argument('--batch_size', type=int, default=100, help='input batch size')
+parser.add_argument('--hidden_size', type=int, default=100, help='hidden state size')
+parser.add_argument('--n_epochs', type=int, default=30, help='the number of epochs to train for')
 parser.add_argument('--lr', type=float, default=0.001, help='learning rate')  # [0.001, 0.0005, 0.0001]
 parser.add_argument('--lr_dc', type=float, default=0.1, help='learning rate decay rate')
 parser.add_argument('--lr_dc_step', type=int, default=3, help='the number of steps after which the learning rate decay')
@@ -28,17 +32,28 @@ parser.add_argument('--nonhybrid', action='store_true', help='only use the globa
 parser.add_argument('--validation', action='store_true', help='validation')
 parser.add_argument('--valid_portion', type=float, default=0.1, help='split the portion of training set as validation set')
 
-parser.add_argument('--data_folder', default='../_data/yoochoose-prep/', type=str)
+parser.add_argument('--seed', default=22, type=int, help="Seed for random initialization")  # Random seed setting
+parser.add_argument('--wandb_project', default='SR-GNN Project', type=str)
+parser.add_argument('--model_name', default='SR-GNN', type=str)
+parser.add_argument('--data_folder', default='../../_data/yoochoose-prep/', type=str)
 parser.add_argument('--train_data', default='recSys15TrainOnly.txt', type=str)
 parser.add_argument('--valid_data', default='recSys15Valid.txt', type=str)
 
 args = parser.parse_args()
 print(args)
 
-wandb.init(project="SR-GNN Project",
-           name=args.dataset)
-config = wandb.config
+args.cuda = torch.cuda.is_available()
+args.device = torch.device('cuda' if args.cuda else 'cpu')
+#use random seed defined
+np.random.seed(args.seed)
+torch.manual_seed(args.seed)
+if args.cuda:
+    torch.cuda.manual_seed(args.seed)
+args.hostname = os.popen('hostname').read().split('.')[0]
 
+args.wandb_project = "SR-GNN Project"
+args.wandb_on = True
+args.debug = False
 
 def main():
     if "yoochoose" in args.dataset:
@@ -68,12 +83,18 @@ def main():
         n_node = 310
 
     model = trans_to_cuda(SessionGraph(args, n_node))
+    if args.wandb_on:
+        wandb.init(project=args.wandb_project,
+                   name=args.model_name + '-' + args.dataset)
+        wandb.config.update(args)
+        wandb.watch(model, log="all")
+
 
     start = time.time()
     best_result = [0, 0]
     best_epoch = [0, 0]
     bad_counter = 0
-    for epoch in range(args.epoch):
+    for epoch in range(args.n_epochs):
         print('-------------------------------------------------------')
         print('epoch: ', epoch)
         hit, mrr = train_test(epoch, model, train_data, test_data)
@@ -88,12 +109,13 @@ def main():
             flag = 1
         print('Best Result:')
         print(f'\tRecall@20:\t{best_result[0]:.4f}'
-              f'\tMMR@20:\t{best_result[1]:.4f}'
+              f'\tMRR@20:\t{best_result[1]:.4f}'
               f'\tEpoch:\t{best_epoch[0]},\t{best_epoch[1]}')
-        wandb.log({"best_recall": best_result[0],
-                   "best_mrr": best_result[1],
-                   "best_recall_epoch": best_epoch[0],
-                   "best_mrr_epoch": best_epoch[1]})
+        if args.wandb_on:
+            wandb.log({"best_recall": best_result[0],
+                       "best_mrr": best_result[1],
+                       "best_recall_epoch": best_epoch[0],
+                       "best_mrr_epoch": best_epoch[1]})
         bad_counter += 1 - flag
         if bad_counter >= args.patience:
             break

@@ -56,21 +56,21 @@ class GNN(Module):
 
 
 class SessionGraph(Module):
-    def __init__(self, opt, n_node):
+    def __init__(self, args, n_node):
         super(SessionGraph, self).__init__()
-        self.hidden_size = opt.hiddenSize
+        self.hidden_size = args.hidden_size
         self.n_node = n_node
-        self.batch_size = opt.batchSize
-        self.nonhybrid = opt.nonhybrid
+        self.batch_size = args.batch_size
+        self.nonhybrid = args.nonhybrid
         self.embedding = nn.Embedding(self.n_node, self.hidden_size)
-        self.gnn = GNN(self.hidden_size, step=opt.step)
+        self.gnn = GNN(self.hidden_size, step=args.step)
         self.linear_one = nn.Linear(self.hidden_size, self.hidden_size, bias=True)
         self.linear_two = nn.Linear(self.hidden_size, self.hidden_size, bias=True)
         self.linear_three = nn.Linear(self.hidden_size, 1, bias=False)
         self.linear_transform = nn.Linear(self.hidden_size * 2, self.hidden_size, bias=True)
         self.loss_function = nn.CrossEntropyLoss()
-        self.optimizer = torch.optim.Adam(self.parameters(), lr=opt.lr, weight_decay=opt.l2)
-        self.scheduler = torch.optim.lr_scheduler.StepLR(self.optimizer, step_size=opt.lr_dc_step, gamma=opt.lr_dc)
+        self.optimizer = torch.optim.Adam(self.parameters(), lr=args.lr, weight_decay=args.l2)
+        self.scheduler = torch.optim.lr_scheduler.StepLR(self.optimizer, step_size=args.lr_dc_step, gamma=args.lr_dc)
         self.reset_parameters()
 
     def reset_parameters(self):
@@ -159,8 +159,8 @@ def train_test(epoch, model, train_data, test_data):
         targets = trans_to_cuda(torch.Tensor(targets).long())
         valid_loss = model.loss_function(scores, targets - 1)
         total_valid_loss += valid_loss.item()
-    hit = np.mean(hit) * 100
-    mrr = np.mean(mrr) * 100
+    hit = np.mean(hit)
+    mrr = np.mean(mrr)
 
     wandb.log({'epoch': epoch, 'train_loss': total_train_loss,
                'valid_loss': total_valid_loss, 'valid_recall': hit, 'valid_mrr': mrr,
