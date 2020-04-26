@@ -1,11 +1,9 @@
 #!/bin/bash
 
 # How to run
-#$ bash train_script.sh simpleGRU yoochoose CrossEntropy 5 50
-#$ bash train_script.sh simpleGRU retailrocket CrossEntropy 5 50
-#$ bash train_script.sh GRU4Rec yoochoose TOP1-max 5 50
-#$ bash train_script.sh GRU4Rec retailrocket TOP1-max 5 50
-
+#$ bash train_script.sh SRGNN diginetica
+#$ bash train_script.sh SRGNN yoochoose1_4
+#$ bash train_script.sh SRGNN yoochoose1_64
 
 # How to kill
 #
@@ -19,8 +17,12 @@ batch_size=$5
 
 echo ${model}, ${dataset}, ${loss}, ${epoch}, ${batch_size}
 
-retailrocket_path="--data_folder ../_data/retailrocket-prep --train_data retailrocket-train.csv --valid_data retailrocket-valid.csv --item2idx_dict item_idx_dict_filtered.pkl"
-yoochoose_path="--data_folder ../_data/yoochoose-prep/ --train_data yoochoose-train.csv --valid_data yoochoose-valid.csv"
+retailrocket_path="--data_folder ../../_data/retailrocket-prep --train_data retailrocket-train.csv --valid_data retailrocket-valid.csv --item2idx_dict item_idx_dict_filtered.pkl"
+yoochoose_path="--data_folder ../../_data/yoochoose-prep/ --train_data yoochoose-train.csv --valid_data yoochoose-valid.csv"
+
+yoochoose1_4_path="--data_folder ../../_data/yoochoose-prep/ --train_data yoochoose1_4-train.txt --valid_data yoochoose1_4-test.txt"
+yoochoose1_64_path="--data_folder ../../_data/yoochoose-prep/ --train_data yoochoose1_64-train.txt --valid_data yoochoose1_64-test.txt"
+diginetica_path="--data_folder ../../_data/diginetica-prep/ --train_data train.txt --valid_data test.txt"
 
 if [ $# == 0 ]; then
   echo "Please specify model and dataset!"
@@ -28,11 +30,11 @@ if [ $# == 0 ]; then
 fi
 
 if [ ${dataset} == "yoochoose1_4" ]; then
-  python -u main.py --dataset ${dataset} > logs-srgnn-yoochoose1_4.out
+  python -u main.py --dataset ${dataset} ${yoochoose1_4_path}
 elif [ ${dataset} == "yoochoose1_64" ]; then
-  python -u main.py --dataset ${dataset} > logs-srgnn-yoochoose1_64.out
+  python -u main.py --dataset ${dataset} ${yoochoose1_64_path}
 elif [ ${dataset} == "diginetica" ]; then
-  python -u main.py --dataset ${dataset} > logs-srgnn-diginetica.out
+  python -u main.py --dataset ${dataset} ${diginetica_path}
 
 else
     echo "(Error) There is no such model or dataset"
