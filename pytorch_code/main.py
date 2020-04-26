@@ -18,6 +18,15 @@ from utils import build_graph, Data, split_validation
 from model import *
 
 parser = argparse.ArgumentParser()
+def str2bool(v):
+    if v.lower() in ('yes', 'true', 't', 'y', '1'): return True
+    elif v.lower() in ('no', 'false', 'f', 'n', '0'): return False
+    else: raise argparse.ArgumentTypeError('Boolean value expected.')
+parser.add_argument('--wandb_project', default='SR-GNN Project', type=str)
+parser.add_argument('--wandb_on', default="True", type=str2bool)
+parser.add_argument('--debug', default="False", type=str2bool)
+# Model argument
+parser.add_argument('--model_name', default='SR-GNN', type=str)
 parser.add_argument('--dataset', default='sample', help='dataset name: diginetica/yoochoose1_4/yoochoose1_64/sample')
 parser.add_argument('--batch_size', type=int, default=100, help='input batch size')
 parser.add_argument('--hidden_size', type=int, default=100, help='hidden state size')
@@ -33,8 +42,6 @@ parser.add_argument('--validation', action='store_true', help='validation')
 parser.add_argument('--valid_portion', type=float, default=0.1, help='split the portion of training set as validation set')
 
 parser.add_argument('--seed', default=22, type=int, help="Seed for random initialization")  # Random seed setting
-parser.add_argument('--wandb_project', default='SR-GNN Project', type=str)
-parser.add_argument('--model_name', default='SR-GNN', type=str)
 parser.add_argument('--data_folder', default='../../_data/yoochoose-prep/', type=str)
 parser.add_argument('--train_data', default='recSys15TrainOnly.txt', type=str)
 parser.add_argument('--valid_data', default='recSys15Valid.txt', type=str)
@@ -50,10 +57,6 @@ torch.manual_seed(args.seed)
 if args.cuda:
     torch.cuda.manual_seed(args.seed)
 args.hostname = os.popen('hostname').read().split('.')[0]
-
-args.wandb_project = "SR-GNN Project"
-args.wandb_on = True
-args.debug = False
 
 def main():
     if "yoochoose" in args.dataset:
