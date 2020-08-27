@@ -83,11 +83,11 @@ class SessionGraph(Module):
         q1 = self.linear_one(ht).view(ht.shape[0], 1, ht.shape[1])  # batch_size x 1 x latent_size
         q2 = self.linear_two(hidden)  # batch_size x seq_length x latent_size
         alpha = self.linear_three(torch.sigmoid(q1 + q2))
-        a = torch.sum(alpha * hidden * mask.view(mask.shape[0], -1, 1).float(), 1)
+        batch_emb = torch.sum(alpha * hidden * mask.view(mask.shape[0], -1, 1).float(), 1)
         if not self.nonhybrid:
-            a = self.linear_transform(torch.cat([a, ht], 1))
-        b = self.embedding.weight[1:]  # n_nodes x latent_size
-        scores = torch.matmul(a, b.transpose(1, 0))
+            batch_emb = self.linear_transform(torch.cat([batch_emb, ht], 1))
+        all_emb = self.embedding.weight[1:]  # n_nodes x latent_size
+        scores = torch.matmul(batch_emb, all_emb.transpose(1, 0))
         return scores
 
     def forward(self, inputs, A):
