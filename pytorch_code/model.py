@@ -43,10 +43,10 @@ class GNN(Module):
         gh = F.linear(hidden, self.w_hh, self.b_hh)     # batch_size x seq_len x gate_size
         i_r, i_i, i_n = gi.chunk(3, 2)
         h_r, h_i, h_n = gh.chunk(3, 2)
-        resetgate = torch.sigmoid(i_r + h_r)
-        inputgate = torch.sigmoid(i_i + h_i)
-        newgate = torch.tanh(i_n + resetgate * h_n)
-        hy = newgate + inputgate * (hidden - newgate)
+        resetgate = torch.sigmoid(i_r + h_r)    # Reset gate
+        inputgate = torch.sigmoid(i_i + h_i)    # Update gate
+        newgate = torch.tanh(i_n + resetgate * h_n) # Decide how much current info is passed
+        hy = newgate + inputgate * (hidden - newgate) # hy = (1-inputgate)*newgate + inputgate*hidden
         return hy
 
     def forward(self, A, hidden):
