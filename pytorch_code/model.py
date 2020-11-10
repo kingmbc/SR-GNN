@@ -39,8 +39,8 @@ class GNN(Module):
         input_in = torch.matmul(A[:, :, :A.shape[1]], self.linear_edge_in(hidden)) + self.b_iah
         input_out = torch.matmul(A[:, :, A.shape[1]: 2 * A.shape[1]], self.linear_edge_out(hidden)) + self.b_oah
         inputs = torch.cat([input_in, input_out], 2)
-        gi = F.linear(inputs, self.w_ih, self.b_ih)
-        gh = F.linear(hidden, self.w_hh, self.b_hh)
+        gi = F.linear(inputs, self.w_ih, self.b_ih)     # batch_size x seq_len x gate_size
+        gh = F.linear(hidden, self.w_hh, self.b_hh)     # batch_size x seq_len x gate_size
         i_r, i_i, i_n = gi.chunk(3, 2)
         h_r, h_i, h_n = gh.chunk(3, 2)
         resetgate = torch.sigmoid(i_r + h_r)
