@@ -122,7 +122,7 @@ def forward(model, i, data):
     return targets, model.compute_scores(seq_hidden, mask)
 
 
-def train_test(epoch, model, train_data, test_data):
+def train_test(epoch, model, train_data, test_data, args):
     st = time.time()
     model.scheduler.step()
     print('start training: ', datetime.datetime.now())
@@ -162,8 +162,9 @@ def train_test(epoch, model, train_data, test_data):
     hit = np.mean(hit)
     mrr = np.mean(mrr)
 
-    wandb.log({'epoch': epoch, 'train_loss': total_train_loss,
-               'valid_loss': total_valid_loss, 'valid_recall': hit, 'valid_mrr': mrr,
-               'time': time.time() - st})
+    if args.wandb_on:
+        wandb.log({'epoch': epoch, 'train_loss': total_train_loss,
+                   'valid_loss': total_valid_loss, 'valid_recall': hit, 'valid_mrr': mrr,
+                   'time': time.time() - st})
 
     return hit, mrr
