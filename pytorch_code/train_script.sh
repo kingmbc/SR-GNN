@@ -29,11 +29,11 @@ if [ $# == 0 ]; then
 fi
 
 if [ ${dataset} == "yoochoose1_4" ]; then
-  python -u main.py --dataset ${dataset} ${yoochoose1_4_path}
+  python -u main.py --dataset ${dataset} ${yoochoose1_4_path} --batch_size ${batch_size}
 elif [ ${dataset} == "yoochoose1_64" ]; then
-  python -u main.py --dataset ${dataset} ${yoochoose1_64_path}
+  python -u main.py --dataset ${dataset} ${yoochoose1_64_path} --batch_size ${batch_size}
 elif [ ${dataset} == "diginetica" ]; then
-  python -u main.py --dataset ${dataset} ${diginetica_path}
+  python -u main.py --dataset ${dataset} ${diginetica_path} --batch_size ${batch_size}
 
 else
     echo "(Error) There is no such model or dataset"
