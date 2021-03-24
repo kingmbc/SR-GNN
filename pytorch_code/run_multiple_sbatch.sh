@@ -13,8 +13,8 @@ models=(SRGNN) # (TimeRec GRU4Rec SRGNN)
 datasets=(diginetica yoochoose1_4 yoochoose1_64) # (yoochoose retailrocket diginetica yoochoose1_4 yoochoose1_64)
 losses=(CrossEntropy) # (TOP1 BPR TOP1-max BPR-max CrossEntropy)
 n_epochs=(30)  #(5 10 20)
-batch_sizes=(100 256) # (32 50 500)
-topks=(5 10 20 30)  #(5 10 20)
+batch_sizes=(100) # (32 50 500)
+topks=(5 10 30)  #(5 10 20)
 
 for m in ${models[@]}; do
   for d in ${datasets[@]}; do
