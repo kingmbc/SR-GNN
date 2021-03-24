@@ -16,12 +16,12 @@ batch_size=$5
 
 echo ${model}, ${dataset}, ${loss}, ${epoch}, ${batch_size}
 
-retailrocket_path="--data_folder ../../_data/retailrocket-prep --train_data retailrocket-train.csv --valid_data retailrocket-valid.csv --item2idx_dict item_idx_dict_filtered.pkl"
-yoochoose_path="--data_folder ../../_data/yoochoose-prep/ --train_data yoochoose-train.csv --valid_data yoochoose-valid.csv"
+retailrocket_path="--data_folder ../../_data/retailrocket/processed --train_data retailrocket-train.csv --valid_data retailrocket-valid.csv --item2idx_dict item_idx_dict_filtered.pkl"
+yoochoose_path="--data_folder ../../_data/yoochoose/processed/ --train_data yoochoose-train.csv --valid_data yoochoose-valid.csv"
 
-yoochoose1_4_path="--data_folder ../../_data/yoochoose-prep/ --train_data yoochoose1_4-train.txt --valid_data yoochoose1_4-test.txt"
-yoochoose1_64_path="--data_folder ../../_data/yoochoose-prep/ --train_data yoochoose1_64-train.txt --valid_data yoochoose1_64-test.txt"
-diginetica_path="--data_folder ../../_data/diginetica-prep/ --train_data train.txt --valid_data test.txt"
+yoochoose1_4_path="--data_folder ../../_data/yoochoose/processed/ --train_data yoochoose1_4-train.txt --valid_data yoochoose1_4-test.txt"
+yoochoose1_64_path="--data_folder ../../_data/yoochoose/processed/ --train_data yoochoose1_64-train.txt --valid_data yoochoose1_64-test.txt"
+diginetica_path="--data_folder ../../_data/diginetica/processed/ --train_data train.txt --valid_data test.txt"
 
 if [ $# == 0 ]; then
   echo "Please specify model and dataset!"

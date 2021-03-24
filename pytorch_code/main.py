@@ -42,7 +42,7 @@ parser.add_argument('--validation', action='store_true', help='validation')
 parser.add_argument('--valid_portion', type=float, default=0.1, help='split the portion of training set as validation set')
 
 parser.add_argument('--seed', default=22, type=int, help="Seed for random initialization")  # Random seed setting
-parser.add_argument('--data_folder', default='../../_data/diginetica-prep/', type=str)
+parser.add_argument('--data_folder', default='../../_data/diginetica/processed/', type=str)
 parser.add_argument('--train_data', default='train.txt', type=str)
 parser.add_argument('--valid_data', default='test.txt', type=str)
 
