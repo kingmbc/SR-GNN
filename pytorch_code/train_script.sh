@@ -13,8 +13,9 @@ dataset=$2
 loss=$3
 epoch=$4
 batch_size=$5
+topk=$6
 
-echo ${model}, ${dataset}, ${loss}, ${epoch}, ${batch_size}
+echo ${model}, ${dataset}, ${loss}, ${epoch}, ${batch_size}, ${topk}
 
 retailrocket_path="--data_folder ../../_data/retailrocket/processed --train_data retailrocket-train.csv --valid_data retailrocket-valid.csv --item2idx_dict item_idx_dict_filtered.pkl"
 yoochoose_path="--data_folder ../../_data/yoochoose/processed/ --train_data yoochoose-train.csv --valid_data yoochoose-valid.csv"
@@ -29,11 +30,11 @@ if [ $# == 0 ]; then
 fi
 
 if [ ${dataset} == "yoochoose1_4" ]; then
-  python -u main.py --dataset ${dataset} ${yoochoose1_4_path} --batch_size ${batch_size}
+  python -u main.py --dataset ${dataset} ${yoochoose1_4_path} --batch_size ${batch_size} --topk ${topk}
 elif [ ${dataset} == "yoochoose1_64" ]; then
-  python -u main.py --dataset ${dataset} ${yoochoose1_64_path} --batch_size ${batch_size}
+  python -u main.py --dataset ${dataset} ${yoochoose1_64_path} --batch_size ${batch_size} --topk ${topk}
 elif [ ${dataset} == "diginetica" ]; then
-  python -u main.py --dataset ${dataset} ${diginetica_path} --batch_size ${batch_size}
+  python -u main.py --dataset ${dataset} ${diginetica_path} --batch_size ${batch_size} --topk ${topk}
 
 else
     echo "(Error) There is no such model or dataset"

@@ -10,21 +10,24 @@ fi
 
 cluster=$1
 models=(SRGNN) # (TimeRec GRU4Rec SRGNN)
-datasets=(yoochoose1_4) # (yoochoose retailrocket diginetica yoochoose1_4 yoochoose1_64)
+datasets=(diginetica yoochoose1_4 yoochoose1_64) # (yoochoose retailrocket diginetica yoochoose1_4 yoochoose1_64)
 losses=(CrossEntropy) # (TOP1 BPR TOP1-max BPR-max CrossEntropy)
 n_epochs=(30)  #(5 10 20)
-batch_sizes=(50 100 256 512) # (32 50 500)
+batch_sizes=(100 256) # (32 50 500)
+topkss=(5 10 20 30)  #(5 10 20)
 
 for m in ${models[@]}; do
   for d in ${datasets[@]}; do
     for l in ${losses[@]}; do
       for e in ${n_epochs[@]}; do
         for b in ${batch_sizes[@]}; do
-          if [ ${cluster} == "cassio" ]; then
-            sbatch --export=model=$m,dataset=$d,loss=$l,epoch=$e,batch_size=$b slurm_jobs_cassio.sbatch
-          elif [ ${cluster} == "prince" ]; then
-            sbatch --export=model=$m,dataset=$d,loss=$l,epoch=$e,batch_size=$b slurm_jobs_prince.sbatch
-          fi
+          for k in ${topks[@]}; do
+            if [ ${cluster} == "cassio" ]; then
+              sbatch --export=model=$m,dataset=$d,loss=$l,epoch=$e,batch_size=$b,topk=$k slurm_jobs_cassio.sbatch
+            elif [ ${cluster} == "prince" ]; then
+              sbatch --export=model=$m,dataset=$d,loss=$l,epoch=$e,batch_size=$b,topk=$k slurm_jobs_prince.sbatch
+            fi
+          done
         done
       done
     done

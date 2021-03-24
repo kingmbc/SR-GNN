@@ -148,7 +148,7 @@ def train_test(epoch, model, train_data, test_data, args):
     slices = test_data.generate_batch(model.batch_size)
     for i in slices:
         targets, scores = forward(model, i, test_data)
-        sub_scores = scores.topk(20)[1]
+        sub_scores = scores.topk(args.topk)[1]
         sub_scores = trans_to_cpu(sub_scores).detach().numpy()
         for score, target, mask in zip(sub_scores, targets, test_data.mask):
             hit.append(np.isin(target - 1, score))

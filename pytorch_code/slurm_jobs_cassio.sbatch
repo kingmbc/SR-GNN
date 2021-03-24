@@ -46,4 +46,4 @@ source activate pytorch
 cd /misc/vlgscratch4/ChoGroup/tk2637/workspace/Recsys_Practice
 cd SR-GNN/pytorch_code
 
-bash train_script.sh $model $dataset $loss $epoch $batch_size
+bash train_script.sh $model $dataset $loss $epoch $batch_size $topk
