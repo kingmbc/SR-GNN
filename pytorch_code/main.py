@@ -40,7 +40,7 @@ parser.add_argument('--patience', type=int, default=10, help='the number of epoc
 parser.add_argument('--nonhybrid', action='store_true', help='only use the global preference to predict')
 parser.add_argument('--validation', action='store_true', help='validation')
 parser.add_argument('--valid_portion', type=float, default=0.1, help='split the portion of training set as validation set')
-parser.add_argument('--topk', type=int, default=20, help='used for evaluation metric at k')
+parser.add_argument('--top_k', type=int, default=20, help='used for evaluation metric at k')
 
 
 parser.add_argument('--seed', default=22, type=int, help="Seed for random initialization")  # Random seed setting
@@ -108,8 +108,8 @@ def main():
             best_epoch[1] = epoch
             flag = 1
         print('Best Result:')
-        print(f'\tRecall@{args.topk}:\t{best_result[0]:.4f}'
-              f'\tMRR@{args.topk}:\t{best_result[1]:.4f}'
+        print(f'\tRecall@{args.top_k}:\t{best_result[0]:.4f}'
+              f'\tMRR@{args.top_k}:\t{best_result[1]:.4f}'
               f'\tEpoch:\t{best_epoch[0]},\t{best_epoch[1]}')
         if args.wandb_on:
             wandb.log({"best_recall": best_result[0],
